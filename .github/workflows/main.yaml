@@ -1,0 +1,61 @@
+name: compile Nuruk
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # front
+  webgl_job:
+    name: compile webgl unity js
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+         # Cache
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: Library
+      #     key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+      #     restore-keys: |
+      #       Library-
+      - name: Create deployment artifact
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          tar -czf "${GITHUB_SHA}".tar.gz --exclude=*.git --exclude=node_modules *.js *.html
+      - name: Store artifact for distribution
+        uses: actions/upload-artifact@v2
+        with:
+          name: Build-WebGL-js
+          path: ${{ github.sha }}.tar.gz
+
+  prepare-release-on-servers_webgl:
+    name: Prepare release webgl
+    runs-on: ubuntu-latest
+    needs: webgl_job
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name:  Build-WebGL-js
+      - name: Upload
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.QA_HOST_FRONTEND }}
+          username: ${{ secrets.QA_HOST_FE_USERNAME }}
+          password: ${{ secrets.QA_HOST_FE_PASSWORD }}
+          source: ${{ github.sha }}.tar.gz
+          target: artifacts
+      - name: connect server
+        uses: appleboy/ssh-action@master
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        with:
+          host: ${{ secrets.QA_HOST_FRONTEND }}
+          username: ${{ secrets.QA_HOST_FE_USERNAME }}
+          password: ${{ secrets.QA_HOST_FE_PASSWORD }}
+          envs: GITHUB_SHA
+          script: |
+            mkdir -p "releases/${GITHUB_SHA}"
+            tar xzf artifacts/${GITHUB_SHA}.tar.gz -C "releases/${GITHUB_SHA}"
+            cp -f releases/${GITHUB_SHA}/* /var/www/webgl/
