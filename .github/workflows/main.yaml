@@ -23,7 +23,7 @@ jobs:
         env:
           GITHUB_SHA: ${{ github.sha }}
         run: |
-          tar -czf "${GITHUB_SHA}".tar.gz --exclude=*.git --exclude=node_modules *.js *.html
+          tar -czf "${GITHUB_SHA}".tar.gz --exclude=*.git --exclude=node_modules *
       - name: Store artifact for distribution
         uses: actions/upload-artifact@v2
         with:
@@ -58,4 +58,4 @@ jobs:
           script: |
             mkdir -p "releases/${GITHUB_SHA}"
             tar xzf artifacts/${GITHUB_SHA}.tar.gz -C "releases/${GITHUB_SHA}"
-            cp -f releases/${GITHUB_SHA}/* /var/www/webgl/
+            cp -rf releases/${GITHUB_SHA}/* /var/www/webgl/
