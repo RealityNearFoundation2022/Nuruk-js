@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Nuruk</title>
     <script src="https://cdn.jsdelivr.net/npm/near-api-js@0.41.0/dist/near-api-js.min.js"></script>
-    <script src="Build/login.loader.js"></script>
+    <script src="Build/web.loader.js"></script>
   
     <!-- <script type="module" src="./indexNear.js"></script>
     <script type="module" src="./utils.js"></script>
@@ -119,9 +119,9 @@
     function CreateCanvas() {
       // Unity Canvas
       createUnityInstance(document.querySelector("#unity-canvas"), {
-        dataUrl: "Build/web.data.unityweb",
-        frameworkUrl: "Build/web.framework.js.unityweb",
-        codeUrl: "Build/web.wasm.unityweb",
+        dataUrl: "Build/web.data",
+        frameworkUrl: "Build/web.framework.js",
+        codeUrl: "Build/web.wasm",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "Nuruk",
